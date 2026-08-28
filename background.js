@@ -1,61 +1,56 @@
-﻿const getBrowser = () => (typeof chrome !== 'undefined' ? chrome : browser);
-const api = getBrowser();
+const getDomain = (url) => {
+  try { return new URL(url).hostname; } catch (e) { return null; }
+};
 
-const COLOR_ENABLED = '#10B981';
-const COLOR_DISABLED = '#F97316';
-
-api.runtime.onInstalled.addListener(() => {
-  api.storage.sync.get(['enabledDomains', 'globalEnabled'], (result) => {
-    if (!result.enabledDomains) {
-      api.storage.sync.set({
-        enabledDomains: {},
-        globalEnabled: false
-      });
-    }
-  });
-});
-
-async function updateBadge(tabId, url) {
-  if (!url || !url.startsWith('http')) {
-    api.action.setBadgeText({ tabId, text: '' });
-    return;
-  }
-
+const updateIcon = async (tabId, url) => {
   try {
-    const domain = new URL(url).hostname;
-    const { enabledDomains = {}, globalEnabled = false } = await api.storage.sync.get([
-      'enabledDomains',
-      'globalEnabled'
-    ]);
-
-    const isEnabled = globalEnabled || !!enabledDomains[domain];
-
-    if (isEnabled) {
-      api.action.setBadgeText({ tabId, text: 'ON' });
-      api.action.setBadgeBackgroundColor({ tabId, color: COLOR_ENABLED });
-    } else {
-      api.action.setBadgeText({ tabId, text: 'OFF' });
-      api.action.setBadgeBackgroundColor({ tabId, color: COLOR_DISABLED });
+    if (!url || url.startsWith('chrome://')) {
+      chrome.action.setIcon({ tabId, path: { "16": "icons/icon16_off.png", "48": "icons/icon48_off.png", "128": "icons/icon128_off.png" } }).catch(()=>{});
+      return;
     }
-  } catch (e) {}
-}
+    
+    const domain = getDomain(url);
+    if (!domain) return;
 
-api.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url) {
-    updateBadge(tabId, tab.url);
+    const data = await chrome.storage.sync.get(['enabledDomains', 'globalEnabled']);
+    const isEnabled = data.globalEnabled || (data.enabledDomains && data.enabledDomains[domain]);
+
+    const path = isEnabled ? {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    } : {
+      "16": "icons/icon16_off.png",
+      "48": "icons/icon48_off.png",
+      "128": "icons/icon128_off.png"
+    };
+
+    chrome.action.setIcon({ tabId, path }).catch(() => {});
+  } catch(err) {
+    // Ignore icon update errors for closed tabs
+  }
+};
+
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  try {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    updateIcon(tab.id, tab.url);
+  } catch(e) {}
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url || changeInfo.status === 'complete') {
+    updateIcon(tabId, tab.url);
   }
 });
 
-api.tabs.onActivated.addListener(async (activeInfo) => {
-  const tab = await api.tabs.get(activeInfo.tabId);
-  if (tab && tab.url) {
-    updateBadge(tab.id, tab.url);
-  }
-});
-
-api.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'UPDATE_BADGE' && message.tabId && message.url) {
-    updateBadge(message.tabId, message.url);
-    sendResponse({ success: true });
+chrome.storage.onChanged.addListener(async (changes, namespace) => {
+  if (namespace === 'sync' && (changes.enabledDomains || changes.globalEnabled)) {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs.length > 0) {
+        updateIcon(tabs[0].id, tabs[0].url);
+      }
+    } catch(e) {}
   }
 });

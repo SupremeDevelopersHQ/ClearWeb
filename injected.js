@@ -1,19 +1,17 @@
-﻿(() => {
+(() => {
+  // ONLY intercept the exact events related to copying/pasting.
+  // NEVER block mousedown, mouseup, or dragstart, as that destroys modern web apps like YouTube.
   const restrictedEvents = new Set([
     'copy',
     'cut',
     'paste',
-    'contextmenu',
-    'selectstart',
-    'dragstart',
-    'mousedown',
-    'mouseup'
+    'contextmenu'
   ]);
 
   const originalAddEventListener = EventTarget.prototype.addEventListener;
   EventTarget.prototype.addEventListener = function (type, listener, options) {
     if (restrictedEvents.has(type?.toLowerCase())) {
-      return;
+      return; // Block websites from disabling copy/paste
     }
     return originalAddEventListener.call(this, type, listener, options);
   };
@@ -23,9 +21,7 @@
     targets.forEach((target) => {
       if (!target) return;
       restrictedEvents.forEach((evt) => {
-        try {
-          target[`on${evt}`] = null;
-        } catch (_) {}
+        try { target[`on${evt}`] = null; } catch (_) {}
       });
     });
   };
@@ -37,18 +33,5 @@
     delete document.oncontextmenu;
     delete document.oncopy;
     delete document.onpaste;
-    delete document.onselectstart;
   } catch (_) {}
-
-  const observer = new MutationObserver(() => {
-    clearInlineHandlers();
-  });
-
-  if (document.documentElement) {
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['oncopy', 'onpaste', 'oncontextmenu', 'style', 'class'],
-      subtree: true
-    });
-  }
 })();

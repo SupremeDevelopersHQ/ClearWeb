@@ -1,43 +1,27 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CopyFreedom</title>
+  <meta charset="utf-8">
   <link rel="stylesheet" href="popup.css">
+  <title>SupremeCopy+</title>
 </head>
 <body>
-  <div class="popup-container">
-    <header class="header">
-      <div class="brand">
-        <span class="brand-icon">🔓</span>
-        <h1 class="brand-title">CopyFreedom</h1>
-      </div>
-      <span class="badge" id="global-badge">OFF</span>
-    </header>
-
-    <div class="domain-card">
-      <span class="domain-label">Current Site</span>
-      <div class="domain-name" id="current-domain">Loading...</div>
+  <div class="container">
+    <div class="header">
+      <h1 class="brand-title">SupremeCopy+</h1>
+      <div class="status-indicator" id="status-text">OFF</div>
     </div>
 
-    <div class="controls">
-      <div class="control-row">
-        <div class="control-info">
-          <span class="control-title">Enable on this site</span>
-          <span class="control-desc">Unblock copy, paste & right-click</span>
-        </div>
+    <div class="card">
+      <div class="toggle-group">
+        <span class="toggle-label">Enable on this site</span>
         <label class="switch">
           <input type="checkbox" id="site-toggle">
           <span class="slider"></span>
         </label>
       </div>
-
-      <div class="control-row secondary">
-        <div class="control-info">
-          <span class="control-title">Enable everywhere</span>
-          <span class="control-desc">Always unblock all websites</span>
-        </div>
+      <div class="toggle-group" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <span class="toggle-label">Global Mode (All Sites)</span>
         <label class="switch">
           <input type="checkbox" id="global-toggle">
           <span class="slider"></span>
@@ -45,28 +29,25 @@
       </div>
     </div>
 
-    <button class="btn-refresh" id="btn-reload" style="display: none;">
-      🔄 Reload page to apply changes
-    </button>
+    <div class="stats-container">
+      <p>🛑 Blocks Defeated: <span id="stats-counter" style="color: white; font-weight: bold;">0</span></p>
+    </div>
 
-    <hr class="divider">
+    <button id="markdown-btn" class="btn-markdown">📝 Copy Selection as Markdown</button>
+    <button id="snipe-btn" class="btn-snipe">🎯 Snipe an Element</button>
+    <button id="reload-btn" class="btn-reload" style="display: none;">↻ Reload page to apply</button>
 
-    <div class="support-section">
-      <p class="support-text">Enjoying CopyFreedom? Support development:</p>
-            <a href="https://buymeacoffee.com/techieajju" target="_blank" class="btn-coffee" id="coffee-link">
+    <div class="footer">
+      <a href="https://buymeacoffee.com/techieajju" target="_blank" class="btn-coffee" id="coffee-link">
         <span class="coffee-icon">☕</span>
         <span class="coffee-text">Buy me a coffee</span>
       </a>
-
-      <!-- LOCAL QR CODE SECTION -->
       <div style="text-align: center; margin-top: 15px;">
         <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">Or scan to support via phone:</p>
         <img src="../icons/qr-code.png" alt="Donate QR Code" style="border-radius: 6px; border: 1px solid var(--border-color); width: 90px; height: 90px; padding: 4px; background: white;">
       </div>
     </div>
   </div>
-
   <script src="popup.js"></script>
 </body>
 </html>
-

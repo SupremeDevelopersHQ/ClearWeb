@@ -1,7 +1,7 @@
 ﻿{
   "manifest_version": 3,
-  "name": "CopyFreedom - Enable Copy & Right Click",
-  "version": "1.0.0",
+  "name": "SupremeCopy+ Allow Right Click & Select",
+  "version": "2.13.0",
   "description": "Re-enables copy, paste, text selection, and right-click context menus on restricted websites.",
   "permissions": [
     "storage",
@@ -12,9 +12,16 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
@@ -33,11 +40,19 @@
       "resources": ["injected.js", "unblock.css"],
       "matches": ["<all_urls>"]
     }
-  ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "copyfreedom@open-source-extension",
-      "strict_min_version": "109.0"
-    }
-  }
+  ]
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
