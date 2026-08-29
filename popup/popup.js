@@ -74,6 +74,7 @@ async function copyToClipboard(text) {
 
 const sendToTab = (type, payload = {}) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
     chrome.tabs.sendMessage(tabs[0].id, { type, ...payload }, { frameId: 0 }).catch(()=>{});
     window.close();
   });
@@ -85,37 +86,13 @@ const imagesBtn = document.getElementById('images-btn');
 if(imagesBtn) imagesBtn.addEventListener('click', () => sendToTab('EXTRACT_IMAGES'));
 document.getElementById('darkmode-btn').addEventListener('click', () => sendToTab('TOGGLE_DARK_MODE'));
 
-document.getElementById('md-btn').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id, allFrames: true },
-      func: () => {
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.toString().trim() === '') return null;
-        const container = document.createElement('div'); container.appendChild(selection.getRangeAt(0).cloneContents());
-        let html = container.innerHTML;
-        let md = html.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n').replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n').replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n').replace(/<strong>(.*?)<\/strong>/gi, '**$1**').replace(/<b>(.*?)<\/b>/gi, '**$1**').replace(/<em>(.*?)<\/em>/gi, '*$1*').replace(/<i>(.*?)<\/i>/gi, '*$1*').replace(/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)').replace(/<br\s*[\/]?>/gi, '\n').replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
-        return md.replace(/<[^>]+>/g, '').trim();
-      }
-    }, async (results) => {
-      const validResult = results && results.find(r => r.result);
-      if (validResult && validResult.result) {
-        try {
-          await copyToClipboard(validResult.result);
-          chrome.tabs.sendMessage(tabs[0].id, { type: 'SHOW_TOAST', toast: '&#128221; Copied as Markdown!' }, { frameId: 0 }).catch(()=>{});
-        } catch(e) {}
-      } else {
-        chrome.scripting.executeScript({ target: { tabId: tabs[0].id, frameId: 0 }, func: () => alert('Please highlight some text on the page first!') });
-      }
-      window.close();
-    });
-  });
-});
+document.getElementById('md-btn').addEventListener('click', () => sendToTab('COPY_MARKDOWN'));
 
 // removed autocopy
 
 document.getElementById('reader-btn').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
     chrome.scripting.executeScript({ target: { tabId: tabs[0].id }, files: ['Readability.js'] }, () => {
       chrome.tabs.sendMessage(tabs[0].id, { type: 'READER_MODE' }).catch(()=>{});
       window.close();
@@ -127,6 +104,7 @@ document.getElementById('reader-btn').addEventListener('click', () => {
 
 document.getElementById('ocr-btn').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
     chrome.scripting.executeScript({ target: { tabId: tabs[0].id }, files: ['tesseract.min.js'] }, () => {
       chrome.tabs.sendMessage(tabs[0].id, { type: 'START_OCR' }).catch(()=>{});
       window.close();
@@ -147,6 +125,7 @@ document.getElementById('download-btn').addEventListener('click', () => {
 // Clean URL Logic
 document.getElementById('clean-url-btn').addEventListener('click', async () => {
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
     try {
       const rawUrl = new URL(tabs[0].url);
       const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'igshid', '_ga', 'mc_eid', 'ttclid', 'ref'];

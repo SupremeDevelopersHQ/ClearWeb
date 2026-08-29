@@ -1,41 +1,42 @@
-# 🚀 SupremeCopy+ Allow Right Click & Select
+<div align="center">
+  <img src="icons/icon128.png" alt="SupremeWeb Logo" width="100"/>
+  <h1>SupremeWeb: The Ultimate Web Toolkit</h1>
+  <p><strong>Transform your browsing experience with the most powerful suite of web enhancements ever created.</strong></p>
+</div>
 
-Are you tired of websites blocking you from copying text, right-clicking, or highlighting content? **SupremeCopy+** is the ultimate power-user toolkit designed to bypass frustrating restrictions and give you absolute control over your web browsing experience.
+---
 
-## ✨ What's New in Version 5.1?
-SupremeCopy+ has evolved from a simple copy-enabler into a massive productivity engine, wrapped in a sleek Google Material Design 3 interface!
+## 🚀 Welcome to SupremeWeb
 
-### 📋 The Clipboard Vault (Time Machine)
-Never lose copied text again. SupremeCopy+ silently intercepts everything you `Ctrl+C` and securely logs it into a local vault. Open the extension to instantly view, search, and re-copy the last 30 items you copied from any website!
+SupremeWeb (formerly SupremeCopy) is no longer just a tool to unblock right-click. It is a comprehensive, all-in-one productivity suite designed to give you absolute control over the internet. Whether you are doing research, avoiding ads, or extracting text from images, SupremeWeb puts the power back in your hands.
 
-### 📸 OCR Image Text Extraction
-Websites sometimes embed text inside flat pictures or PDF canvases (like Google Books) to prevent copying. Click **OCR Text Extraction**, draw a box over any image, and SupremeCopy+ will use built-in AI (Tesseract.js) to magically read the text and copy it to your clipboard!
+### 🌟 Core Features
 
-### 🌙 Force Dark Mode
-Blinded by a stark white website at 2 AM? Click the Dark Mode button to inject a smart-inversion CSS filter that instantly forces the page into pitch black, while intelligently preserving the colors of images and videos.
+* **🛡️ Absolute Unblocker:** Bypasses aggressive website restrictions. Unblocks right-click, text selection, and copying on sites that try to stop you.
+* **🖍️ Persistent Web Highlighter:** Highlight text on *any* webpage. Your highlights are saved locally and will magically reappear whenever you revisit that exact page in the future!
+* **🗄️ Clipboard Vault:** A built-in time machine for your clipboard. It automatically safely stores the last 30 things you copied so you never lose an important link or quote again.
+* **🌙 Universal Dark Mode:** Blinding white website? One click instantly forces a sleek, smart Dark Mode onto any page.
+* **👁️ OCR Image Extraction:** See text locked inside an image or infographic? Use our OCR tool to crop the image and instantly extract the text to your clipboard.
+* **📖 True Reader Mode:** Strips away ads, sidebars, and popups, leaving you with a perfectly formatted, distraction-free reading experience.
+* **🎯 Snipe HTML (Ad-Killer):** Point and click to permanently delete any annoying floating popup, banner, or sticky video player from your screen.
+* **📝 Copy as Markdown:** Instantly copy web content and maintain all its rich formatting (headers, bold, italics, links) for Notion or Obsidian.
+* **🔗 Clean URL:** Copies the current page URL while stripping away annoying and privacy-invading tracking parameters (like `?utm_source=...`).
 
-### 📖 True Reader Mode
-Cluttered news articles with too many ads? Click Reader Mode to instantly strip away the noise and convert the page into a clean, beautiful, distraction-free reading canvas.
+## 🔒 100% Privacy Focused
 
-### 🎯 Snipe HTML
-Annoying newsletter popups, cookie banners, or invisible glass shields blocking your view? Click the Sniper crosshair and hover over any element on the page to instantly delete it.
+We believe your browsing is your business. 
+* **Zero Tracking:** We do not track your browsing history.
+* **100% Local Storage:** Your Clipboard Vault, Highlights, and Settings are saved locally on your computer's hard drive. No data is ever sent to our servers.
 
-### 📝 Copy as Markdown
-Highlight text with rich formatting (bold, italics, links, headers) and click **Copy MD** to instantly copy it as perfectly formatted Markdown for GitHub, Notion, or Obsidian.
+## 🛠️ Installation (Chrome / Edge / Brave)
 
-### 🖼️ Extract Images
-Want to save high-res images from a protected site? Click Extract Images to pull every background image and photo from the page into a beautiful gallery for easy downloading.
+1. Download the latest `.zip` release.
+2. Unzip the folder to your computer.
+3. Open your browser and go to your extensions page (`chrome://extensions/`).
+4. Toggle **Developer mode** ON in the top right corner.
+5. Drag and drop the unzipped folder into the page to install!
 
-### 🔗 Clean URL Copier
-Stop sharing links with massive tracking parameters. Click Clean URL to instantly strip away UTM tags and copy the pure, clean root URL of the page you are on.
-
-### 💾 Save as .txt
-Instantly scrape the text of an entire article and download it as a `.txt` file directly to your hard drive.
-
-## 🛡️ Privacy First (Zero Data Collection)
-We believe your data is yours. SupremeCopy+ runs **100% locally** on your device. The OCR Engine runs entirely in your browser using WebAssembly. The Clipboard Vault uses secure local Chrome storage. We do not track your browsing history, we do not collect analytics, and your copied text never leaves your computer.
-
-## ☕ Support the Developer
-This extension is completely free and maintained out of a passion for a free and open internet. If SupremeCopy+ has saved you time, rescued lost clipboard data, or made your workflow easier, consider buying me a coffee! 
-
-<a href="https://buymeacoffee.com/techieajju" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+---
+<div align="center">
+  Built with ❤️ by <b>SupremeDevelopersHQ</b>
+</div>

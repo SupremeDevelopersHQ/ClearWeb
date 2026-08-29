@@ -3,6 +3,20 @@ const api = getBrowser();
 const currentDomain = window.location.hostname;
 let isUnblocked = false;
 
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+}
+
 // Stats Tracking
 let sessionBlocks = 0;
 let statsTimeout = null;
@@ -92,6 +106,7 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'READER_MODE') enableReaderMode();
   if (request.type === 'EXTRACT_IMAGES') extractImages();
   if (request.type === 'START_OCR') startOCRMode();
+  if (request.type === 'HIGHLIGHT_SELECTION') highlightSelection();
   if (request.type === 'SHOW_TOAST') {
     const d = document.createElement('div'); d.innerHTML = request.toast;
     showToast(d.innerText);
@@ -335,12 +350,71 @@ function startSniperMode() {
 
 function copyAsMarkdown() {
   const selection = window.getSelection();
-  if (!selection.rangeCount || selection.toString().trim() === '') return alert('Please highlight some text on the page first!');
+  if (!selection.rangeCount || selection.toString().trim() === '') return showToast('Please highlight some text on the page first!');
   const container = document.createElement('div'); container.appendChild(selection.getRangeAt(0).cloneContents());
   let html = container.innerHTML;
   let md = html.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n').replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n').replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n').replace(/<strong>(.*?)<\/strong>/gi, '**$1**').replace(/<b>(.*?)<\/b>/gi, '**$1**').replace(/<em>(.*?)<\/em>/gi, '*$1*').replace(/<i>(.*?)<\/i>/gi, '*$1*').replace(/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)').replace(/<br\s*[\/]?>/gi, '\n').replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
   md = md.replace(/<[^>]+>/g, '');
   copyToClipboard(md.trim()).then(() => showToast('Copied as Markdown!'));
 }
+
+// ---------------------------------------------------------
+// PERSISTENT HIGHLIGHTER
+// ---------------------------------------------------------
+function highlightSelection() {
+  const text = window.getSelection().toString().trim();
+  if (!text) {
+    showToast('Please select text to highlight!');
+    return;
+  }
+  
+  document.designMode = "on";
+  document.execCommand("hiliteColor", false, "#ffeb3b");
+  document.designMode = "off";
+  
+  const url = window.location.href.split('#')[0];
+  api.storage.local.get(['webHighlights'], (data) => {
+    const highlights = data.webHighlights || {};
+    if (!highlights[url]) highlights[url] = [];
+    highlights[url].push(text);
+    api.storage.local.set({ webHighlights: highlights });
+    showToast('&#128396; Highlight saved!');
+  });
+  window.getSelection().removeAllRanges();
+}
+
+function restoreHighlights() {
+  const url = window.location.href.split('#')[0];
+  api.storage.local.get(['webHighlights'], (data) => {
+    const highlights = data.webHighlights || {};
+    const pageHighlights = highlights[url];
+    
+    if (pageHighlights && pageHighlights.length > 0) {
+      const scrollX = window.scrollX;
+      const scrollY = window.scrollY;
+      
+      document.designMode = "on";
+      pageHighlights.forEach(text => {
+        window.getSelection().removeAllRanges();
+        document.body.focus();
+        let found = true;
+        let count = 0;
+        while (found && count < 100) {
+          found = window.find(text, false, false, true, false, false, false);
+          if (found) {
+            document.execCommand("hiliteColor", false, "#ffeb3b");
+          }
+          count++;
+        }
+      });
+      document.designMode = "off";
+      window.scrollTo(scrollX, scrollY);
+      window.getSelection().removeAllRanges();
+    }
+  });
+}
+
+// Run restore highlights gently after load
+setTimeout(restoreHighlights, 1000);
 
 checkAndApply();

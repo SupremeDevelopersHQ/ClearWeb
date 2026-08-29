@@ -1,14 +1,16 @@
-﻿{
+{
     "manifest_version":  3,
-    "name":  "SupremeCopy+ Allow Right Click \u0026 Select",
-    "version":  "5.2.0",
-    "description":  "The ultimate web toolkit: unblock right-click \u0026 copy, OCR image text extraction, Dark Mode, Clipboard Vault, and True Reader Mode!",
+    "name":  "SupremeWeb: The Ultimate Web Toolkit",
+    "version":  "6.0.0",
+    "description":  "The ultimate web enhancement suite: unblock right-click, OCR image extraction, Dark Mode, Clipboard Vault, and true Reader Mode!",
     "permissions":  [
                         "storage",
                         "activeTab",
                         "scripting",
                         "downloads",
-                        "tabs"
+                        "tabs",
+                        "contextMenus",
+                        "clipboardWrite"
                     ],
     "host_permissions":  [
                              "\u003call_urls\u003e"

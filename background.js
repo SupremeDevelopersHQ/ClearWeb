@@ -73,3 +73,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   return true;
 });
+
+// Setup Context Menus
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "highlight-text",
+    title: "🖍️ Highlight Text & Save",
+    contexts: ["selection"]
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "highlight-text") {
+    chrome.tabs.sendMessage(tab.id, { type: "HIGHLIGHT_SELECTION" }).catch(()=>{});
+  }
+});
