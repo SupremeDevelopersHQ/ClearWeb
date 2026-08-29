@@ -1,4 +1,4 @@
-﻿const siteToggle = document.getElementById('site-toggle');
+const siteToggle = document.getElementById('site-toggle');
 const globalToggle = document.getElementById('global-toggle');
 const statusText = document.getElementById('status-text');
 const reloadBtn = document.getElementById('reload-btn');
@@ -11,11 +11,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
   chrome.storage.sync.get(['enabledDomains', 'globalEnabled', 'blocksDefeated'], (data) => {
     const enabledDomains = data.enabledDomains || {};
-    
     siteToggle.checked = !!enabledDomains[domain];
     globalToggle.checked = !!data.globalEnabled;
     statsCounter.innerText = data.blocksDefeated || 0;
-    
     updateStatusText();
 
     siteToggle.addEventListener('change', () => {
@@ -23,12 +21,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.storage.sync.set({ enabledDomains });
       updateStatusText();
       notifyTab(currentTab.id, siteToggle.checked || globalToggle.checked);
+      chrome.tabs.reload(currentTab.id);
     });
 
     globalToggle.addEventListener('change', () => {
       chrome.storage.sync.set({ globalEnabled: globalToggle.checked });
       updateStatusText();
       notifyTab(currentTab.id, siteToggle.checked || globalToggle.checked);
+      chrome.tabs.reload(currentTab.id);
     });
   });
 });
@@ -58,22 +58,166 @@ reloadBtn.addEventListener('click', () => {
   window.close();
 });
 
-const snipeBtn = document.getElementById('snipe-btn');
-if(snipeBtn) {
-  snipeBtn.addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'START_SNIPER' });
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
+}
+
+const sendToTab = (type, payload = {}) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { type, ...payload }, { frameId: 0 }).catch(()=>{});
+    window.close();
+  });
+};
+
+document.getElementById('snipe-btn').addEventListener('click', () => sendToTab('START_SNIPER'));
+document.getElementById('extract-images-btn')?.addEventListener('click', () => sendToTab('EXTRACT_IMAGES'));
+const imagesBtn = document.getElementById('images-btn');
+if(imagesBtn) imagesBtn.addEventListener('click', () => sendToTab('EXTRACT_IMAGES'));
+document.getElementById('darkmode-btn').addEventListener('click', () => sendToTab('TOGGLE_DARK_MODE'));
+
+document.getElementById('md-btn').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id, allFrames: true },
+      func: () => {
+        const selection = window.getSelection();
+        if (!selection.rangeCount || selection.toString().trim() === '') return null;
+        const container = document.createElement('div'); container.appendChild(selection.getRangeAt(0).cloneContents());
+        let html = container.innerHTML;
+        let md = html.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n').replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n').replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n').replace(/<strong>(.*?)<\/strong>/gi, '**$1**').replace(/<b>(.*?)<\/b>/gi, '**$1**').replace(/<em>(.*?)<\/em>/gi, '*$1*').replace(/<i>(.*?)<\/i>/gi, '*$1*').replace(/<a[^>]*href="(.*?)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)').replace(/<br\s*[\/]?>/gi, '\n').replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+        return md.replace(/<[^>]+>/g, '').trim();
+      }
+    }, async (results) => {
+      const validResult = results && results.find(r => r.result);
+      if (validResult && validResult.result) {
+        try {
+          await copyToClipboard(validResult.result);
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'SHOW_TOAST', toast: '&#128221; Copied as Markdown!' }, { frameId: 0 }).catch(()=>{});
+        } catch(e) {}
+      } else {
+        chrome.scripting.executeScript({ target: { tabId: tabs[0].id, frameId: 0 }, func: () => alert('Please highlight some text on the page first!') });
+      }
       window.close();
+    });
+  });
+});
+
+// removed autocopy
+
+document.getElementById('reader-btn').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({ target: { tabId: tabs[0].id }, files: ['Readability.js'] }, () => {
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'READER_MODE' }).catch(()=>{});
+      window.close();
+    });
+  });
+});
+
+// bypass button removed
+
+document.getElementById('ocr-btn').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({ target: { tabId: tabs[0].id }, files: ['tesseract.min.js'] }, () => {
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'START_OCR' }).catch(()=>{});
+      window.close();
+    });
+  });
+});
+
+document.getElementById('download-btn').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { type: 'GET_ARTICLE_TEXT' }, (response) => {
+      if (chrome.runtime.lastError || !response || !response.text) return;
+      chrome.runtime.sendMessage({ type: 'DOWNLOAD_TEXT', text: response.text, title: response.title });
+      window.close();
+    });
+  });
+});
+
+// Clean URL Logic
+document.getElementById('clean-url-btn').addEventListener('click', async () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    try {
+      const rawUrl = new URL(tabs[0].url);
+      const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'igshid', '_ga', 'mc_eid', 'ttclid', 'ref'];
+      trackingParams.forEach(param => rawUrl.searchParams.delete(param));
+      const cleaned = rawUrl.toString();
+      
+      await copyToClipboard(cleaned);
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'SHOW_TOAST', toast: '&#128279; Clean URL Copied!' }, { frameId: 0 }).catch(()=>{});
+    } catch(e) {}
+    window.close();
+  });
+});
+
+// Tabs logic
+document.getElementById('tab-tools').addEventListener('click', () => {
+  document.getElementById('tab-tools').classList.add('active');
+  document.getElementById('tab-vault').classList.remove('active');
+  document.getElementById('view-tools').style.display = 'block';
+  document.getElementById('view-vault').style.display = 'none';
+});
+document.getElementById('tab-vault').addEventListener('click', () => {
+  document.getElementById('tab-vault').classList.add('active');
+  document.getElementById('tab-tools').classList.remove('active');
+  document.getElementById('view-vault').style.display = 'block';
+  document.getElementById('view-tools').style.display = 'none';
+  loadVault();
+});
+
+function loadVault() {
+  chrome.storage.local.get(['clipboardHistory'], (data) => {
+    const list = document.getElementById('vault-list');
+    list.innerHTML = '';
+    const history = data.clipboardHistory || [];
+    if (history.length === 0) {
+      list.innerHTML = '<p style="text-align:center; color:#9aa0a6; margin-top:20px;">Your vault is empty.<br><br>Copy some text on any page and it will magically appear here!</p>';
+      return;
+    }
+    history.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'background:#f8f9fa; border:1px solid #dadce0; border-radius:4px; padding:10px; margin-bottom:8px; cursor:pointer; position:relative; text-align:left; transition:0.2s;';
+      const textPreview = item.text.length > 80 ? item.text.substring(0, 80) + '...' : item.text;
+      const safeTitle = item.title ? item.title.replace(/</g, '&lt;') : 'Copied item';
+      const safeText = textPreview.replace(/</g, '&lt;');
+      
+      div.innerHTML = `
+        <div style="font-size:11px; color:#5f6368; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">${safeTitle}</span>
+          <span>${new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        </div>
+        <div style="font-size:13px; color:#202124; line-height:1.4; word-break:break-word;">${safeText}</div>
+      `;
+      div.addEventListener('mouseover', () => div.style.background = '#f1f3f4');
+      div.addEventListener('mouseout', () => div.style.background = '#f8f9fa');
+      div.addEventListener('click', async () => {
+        try {
+          await copyToClipboard(item.text);
+          div.style.background = '#e8f0fe';
+          div.style.borderColor = '#d2e3fc';
+          setTimeout(() => {
+            div.style.background = '#f8f9fa';
+            div.style.borderColor = '#dadce0';
+          }, 400);
+        } catch(e) {}
+      });
+      list.appendChild(div);
     });
   });
 }
 
-const mdBtn = document.getElementById('markdown-btn');
-if(mdBtn) {
-  mdBtn.addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'COPY_MARKDOWN' });
-      window.close();
-    });
+document.getElementById('clear-vault-btn').addEventListener('click', () => {
+  chrome.storage.local.set({ clipboardHistory: [] }, () => {
+    loadVault();
   });
-}
+});

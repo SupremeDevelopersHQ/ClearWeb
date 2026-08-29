@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupremeCopy+ | The Ultimate Web Toolkit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --bg-color: #ffffff;
+            --surface: #f8f9fa;
+            --text-main: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px;
+            background: linear-gradient(180deg, #e8f0fe 0%, #ffffff 100%);
+        }
+        .hero h1 { font-size: 56px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; letter-spacing: -1px; }
+        .hero p { font-size: 22px; color: var(--text-light); max-width: 700px; margin: 0 auto 40px; }
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-weight: 500;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+        }
+        .btn:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-light);
+            box-shadow: none;
+            border: 2px solid var(--border);
+            margin-left: 15px;
+        }
+        .btn-outline:hover { background-color: var(--surface); color: var(--text-main); }
+
+        /* Features Grid */
+        .features-section { padding: 80px 0; text-align: center; }
+        .features-section h2 { font-size: 36px; margin-bottom: 60px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+        }
+        .icon { font-size: 40px; margin-bottom: 20px; display: inline-block; background: #e8f0fe; width: 80px; height: 80px; line-height: 80px; text-align: center; border-radius: 20px; }
+        .card h3 { font-size: 22px; margin-bottom: 12px; }
+        .card p { color: var(--text-light); font-size: 16px; line-height: 1.5; }
+
+        /* Privacy Banner */
+        .privacy {
+            background: var(--text-main);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 24px;
+            margin: 60px auto;
+            max-width: 1000px;
+        }
+        .privacy h2 { font-size: 32px; margin-bottom: 16px; }
+        .privacy p { font-size: 18px; color: #9aa0a6; max-width: 600px; margin: 0 auto; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 40px; }
+            .hero p { font-size: 18px; }
+            .btn-outline { margin-left: 0; margin-top: 15px; display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>The Ultimate Web Toolkit.</h1>
+            <p>Unblock copy-paste, extract text from images, force dark mode on any site, and never lose your clipboard history again.</p>
+            <a href="#" class="btn">Add to Chrome — It's Free</a>
+            <a href="https://github.com/AjayJamkhede" class="btn btn-outline" target="_blank">View on GitHub</a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section container">
+        <h2>Supercharge Your Browser.</h2>
+        <div class="grid">
+            
+            <div class="card">
+                <div class="icon">🔓</div>
+                <h3>Copy Unblocker</h3>
+                <p>Instantly bypass restricted websites. Re-enable right-click, text selection, and copy-pasting anywhere on the web.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📋</div>
+                <h3>Clipboard Vault</h3>
+                <p>Never lose copied text again. We securely log the last 30 things you copy so you can search and paste them later.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📸</div>
+                <h3>OCR Image Extraction</h3>
+                <p>Text trapped in an image or protected PDF? Draw a box over it and our built-in AI will magically extract the text.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">🌙</div>
+                <h3>Force Dark Mode</h3>
+                <p>Blinded by a white webpage at 2 AM? Inject a smart-inversion filter that instantly turns any site pitch black.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">📖</div>
+                <h3>True Reader Mode</h3>
+                <p>Strip away annoying ads, sidebars, and popups. Instantly convert any cluttered article into a beautiful, distraction-free canvas.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon">🎯</div>
+                <h3>Snipe HTML</h3>
+                <p>Tired of invisible glass shields and newsletter popups blocking your screen? Click the crosshair to delete them instantly.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="privacy">
+        <h2>🛡️ 100% Private. 100% Local.</h2>
+        <p>Your data belongs to you. SupremeCopy+ runs entirely on your device. We do not track your browsing history, and your Clipboard Vault never leaves your computer.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 20px;">Built for a free and open internet.</p>
+            <a href="https://buymeacoffee.com/techieajju" target="_blank">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px; border-radius: 8px;">
+            </a>
+            <p style="margin-top: 30px; font-size: 14px;">&copy; 2026 SupremeCopy+. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

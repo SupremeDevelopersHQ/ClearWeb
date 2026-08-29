@@ -1,58 +1,60 @@
-﻿{
-  "manifest_version": 3,
-  "name": "SupremeCopy+ Allow Right Click & Select",
-  "version": "2.13.0",
-  "description": "Re-enables copy, paste, text selection, and right-click context menus on restricted websites.",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_start",
-      "all_frames": true
-    }
-  ],
-  "action": {
-    "default_popup": "popup/popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["injected.js", "unblock.css"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+{
+    "manifest_version":  3,
+    "name":  "SupremeCopy+ Allow Right Click & Select",
+    "version":  "5.1.0",
+    "description":  "The ultimate web toolkit: unblock right-click & copy, OCR image text extraction, Dark Mode, Clipboard Vault, and True Reader Mode!",
+    "permissions":  [
+                        "storage",
+                        "activeTab",
+                        "scripting",
+                        "downloads",
+                        "tabs"
+                    ],
+    "host_permissions":  [
+                             "\u003call_urls\u003e"
+                         ],
+    "background":  {
+                       "service_worker":  "background.js"
+                   },
+    "content_scripts":  [
+                            {
+                                "matches":  [
+                                                "\u003call_urls\u003e"
+                                            ],
+                                "js":  [
+                                           "content.js"
+                                       ],
+                                "run_at":  "document_start",
+                                "all_frames":  true
+                            }
+                        ],
+    "action":  {
+                   "default_popup":  "popup/popup.html",
+                   "default_icon":  {
+                                        "16":  "icons/icon16.png",
+                                        "48":  "icons/icon48.png",
+                                        "128":  "icons/icon128.png"
+                                    }
+               },
+    "icons":  {
+                  "16":  "icons/icon16.png",
+                  "48":  "icons/icon48.png",
+                  "128":  "icons/icon128.png"
+              },
+    "web_accessible_resources":  [
+                                     {
+                                         "resources":  [
+                                                           "injected.js",
+                                                           "unblock.css",
+                                                           "worker.min.js",
+                                                           "tesseract-core.wasm.js",
+                                                           "eng.traineddata.gz",
+                                                           "tesseract.min.js",
+                                                           "Readability.js"
+                                                       ],
+                                         "matches":  [
+                                                         "\u003call_urls\u003e"
+                                                     ]
+                                     }
+                                 ]
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

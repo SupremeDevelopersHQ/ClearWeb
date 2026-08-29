@@ -4,6 +4,25 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="popup.css">
   <title>SupremeCopy+</title>
+  <style>
+    .btn-action {
+      background-color: #ffffff;
+      color: #1a73e8;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Google Sans', Roboto, 'Segoe UI', Arial, sans-serif;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      margin-bottom: 8px;
+      box-shadow: none;
+    }
+    .btn-action:hover { background-color: #f8f9fa; border-color: #d2e3fc; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -12,40 +31,66 @@
       <div class="status-indicator" id="status-text">OFF</div>
     </div>
 
-    <div class="card">
-      <div class="toggle-group">
-        <span class="toggle-label">Enable on this site</span>
-        <label class="switch">
-          <input type="checkbox" id="site-toggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="toggle-group" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <span class="toggle-label">Global Mode (All Sites)</span>
-        <label class="switch">
-          <input type="checkbox" id="global-toggle">
-          <span class="slider"></span>
-        </label>
-      </div>
+    <div class="tabs">
+      <div class="tab active" id="tab-tools">Tools</div>
+      <div class="tab" id="tab-vault">Clipboard Vault</div>
     </div>
 
-    <div class="stats-container">
-      <p>🛑 Blocks Defeated: <span id="stats-counter" style="color: white; font-weight: bold;">0</span></p>
+    <div id="view-tools">
+      <div class="card">
+        <div class="toggle-group">
+          <span class="toggle-label">Enable on this site</span>
+          <label class="switch">
+            <input type="checkbox" id="site-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-group" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.05);">
+          <span class="toggle-label">Global Mode (All Sites)</span>
+          <label class="switch">
+            <input type="checkbox" id="global-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="stats-container" style="margin-bottom: 12px; padding: 10px;">
+        <p>&#128737; Blocks Defeated: <span id="stats-counter" style="color: #1a73e8; font-weight: bold;">0</span></p>
+      </div>
+
+      <button id="md-btn" class="btn-action">&#128221; Copy MD</button>
+      
+      <div class="grid">
+        <button id="reader-btn" class="btn-action">&#128214; Reader Mode</button>
+        <button id="darkmode-btn" class="btn-action">&#127769; Dark Mode</button>
+      </div>
+      
+      <div class="grid">
+        <button id="download-btn" class="btn-action">&#128190; Save as .txt</button>
+        <button id="images-btn" class="btn-action">&#128444; Extract Images</button>
+      </div>
+
+      <div class="grid">
+        <button id="snipe-btn" class="btn-action">&#127919; Snipe HTML</button>
+        <button id="clean-url-btn" class="btn-action">&#128279; Clean URL</button>
+      </div>
+
+      <button id="ocr-btn" class="btn-action">&#128269; OCR Image Text</button>
+      <button id="reload-btn" class="btn-action" style="display: none;">&#128260; Reload page to apply</button>
     </div>
 
-    <button id="markdown-btn" class="btn-markdown">📝 Copy Selection as Markdown</button>
-    <button id="snipe-btn" class="btn-snipe">🎯 Snipe an Element</button>
-    <button id="reload-btn" class="btn-reload" style="display: none;">↻ Reload page to apply</button>
+    <div id="view-vault" style="display: none;">
+      <div id="vault-list" style="max-height: 380px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
+        <!-- Populated by JS -->
+      </div>
+      <button id="clear-vault-btn" class="btn-action" style="color: #d93025; border-color: #fce8e6; background: #fce8e6; margin-bottom: 0;">&#128465; Clear History</button>
+    </div>
 
-    <div class="footer">
-      <a href="https://buymeacoffee.com/techieajju" target="_blank" class="btn-coffee" id="coffee-link">
-        <span class="coffee-icon">☕</span>
-        <span class="coffee-text">Buy me a coffee</span>
+    <div style="text-align: center; margin-top: 15px; border-top: 1px solid #dadce0; padding-top: 15px;">
+      <p style="font-size: 13px; color: #5f6368; font-weight: 500; margin: 0 0 10px 0;">&#9749; Support the Developer</p>
+      <a href="https://buymeacoffee.com/" target="_blank">
+        <img src="../icons/qr-code.png" style="width: 130px; border-radius: 8px; border: 2px solid var(--accent-color); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" alt="Buy Me A Coffee QR Code">
       </a>
-      <div style="text-align: center; margin-top: 15px;">
-        <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;">Or scan to support via phone:</p>
-        <img src="../icons/qr-code.png" alt="Donate QR Code" style="border-radius: 6px; border: 1px solid var(--border-color); width: 90px; height: 90px; padding: 4px; background: white;">
-      </div>
     </div>
   </div>
   <script src="popup.js"></script>
