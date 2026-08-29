@@ -1,4 +1,4 @@
-const getBrowser = () => (typeof chrome !== 'undefined' ? chrome : browser);
+﻿const getBrowser = () => (typeof chrome !== 'undefined' ? chrome : browser);
 const api = getBrowser();
 const currentDomain = window.location.hostname;
 let isUnblocked = false;
@@ -418,3 +418,75 @@ function restoreHighlights() {
 setTimeout(restoreHighlights, 1000);
 
 checkAndApply();
+
+// --- NUKE COOKIES ---
+function nukeCookieBanners() {
+  const keywords = ['cookie', 'consent', 'gdpr', 'privacy'];
+  const acceptWords = ['accept', 'allow', 'agree', 'got it', 'understand'];
+  const elements = document.querySelectorAll('div, section, aside, dialogue');
+  for (let el of elements) {
+    const style = window.getComputedStyle(el);
+    if (style.position === 'fixed' || style.position === 'sticky' || style.position === 'absolute') {
+      const text = el.innerText.toLowerCase();
+      const zIndex = parseInt(style.zIndex) || 0;
+      if (zIndex > 90 && keywords.some(k => text.includes(k)) && acceptWords.some(w => text.includes(w))) {
+        el.remove();
+        document.body.style.overflow = 'auto'; 
+      }
+    }
+  }
+}
+
+api.storage.sync.get(['nukeCookies'], (data) => {
+  if (data.nukeCookies) {
+    nukeCookieBanners();
+    setTimeout(nukeCookieBanners, 2000);
+    setTimeout(nukeCookieBanners, 5000);
+  }
+});
+
+// --- AUTO SCROLL ---
+let scrollInterval = null;
+function startAutoScroll() {
+  if (scrollInterval) {
+    clearInterval(scrollInterval);
+    scrollInterval = null;
+    return;
+  }
+  let speed = 1.5;
+  scrollInterval = setInterval(() => {
+    window.scrollBy(0, speed);
+  }, 20);
+  
+  const panel = document.createElement('div');
+  panel.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 15px;border-radius:20px;z-index:9999999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;cursor:pointer;';
+  panel.innerHTML = <span>&#128196; Auto-Scroll Active</span> <button id="cw-stop-scroll" style="background:#ef4444;border:none;color:white;padding:4px 8px;border-radius:8px;cursor:pointer;font-weight:bold;">Stop</button>;
+  document.body.appendChild(panel);
+  
+  panel.querySelector('#cw-stop-scroll').onclick = (e) => {
+    e.stopPropagation();
+    clearInterval(scrollInterval);
+    scrollInterval = null;
+    panel.remove();
+  };
+  
+  const stopEvents = () => {
+    if(scrollInterval) {
+      clearInterval(scrollInterval);
+      scrollInterval = null;
+      if(panel && panel.parentNode) panel.remove();
+    }
+    document.removeEventListener('wheel', stopEvents);
+    document.removeEventListener('mousedown', stopEvents);
+  };
+  
+  setTimeout(() => {
+    document.addEventListener('wheel', stopEvents);
+    document.addEventListener('mousedown', stopEvents);
+  }, 500);
+}
+
+api.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === 'NUKE_COOKIES' && request.enabled) nukeCookieBanners();
+  if (request.type === 'START_AUTOSCROLL') startAutoScroll();
+});

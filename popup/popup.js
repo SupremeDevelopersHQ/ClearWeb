@@ -1,5 +1,6 @@
 ﻿const siteToggle = document.getElementById('site-toggle');
 const globalToggle = document.getElementById('global-toggle');
+const cookieToggle = document.getElementById('cookie-toggle');
 const statusText = document.getElementById('status-text');
 const reloadBtn = document.getElementById('reload-btn');
 const statsCounter = document.getElementById('stats-counter');
@@ -24,6 +25,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.reload(currentTab.id);
     });
 
+        cookieToggle.addEventListener('change', () => {
+      chrome.storage.sync.set({ nukeCookies: cookieToggle.checked });
+      chrome.tabs.sendMessage(currentTab.id, { type: 'NUKE_COOKIES', enabled: cookieToggle.checked }).catch(()=>{});
+    });
     globalToggle.addEventListener('change', () => {
       chrome.storage.sync.set({ globalEnabled: globalToggle.checked });
       updateStatusText();
@@ -203,3 +208,6 @@ document.getElementById('clear-vault-btn').addEventListener('click', () => {
 
 document.getElementById('screenshot-btn').addEventListener('click', () => chrome.runtime.sendMessage({type: 'FULL_SCREENSHOT'}));
 
+
+
+document.getElementById('autoscroll-btn').addEventListener('click', () => sendToTab('START_AUTOSCROLL'));
