@@ -1,14 +1,14 @@
 <div align="center">
-  <img src="icons/icon128.png" alt="SupremeWeb Logo" width="100"/>
-  <h1>SupremeWeb: The Ultimate Web Toolkit</h1>
+  <img src="icons/icon128.png" alt="ClearWeb Logo" width="100"/>
+  <h1>ClearWeb: The Ultimate Web Toolkit</h1>
   <p><strong>Transform your browsing experience with the most powerful suite of web enhancements ever created.</strong></p>
 </div>
 
 ---
 
-## 🚀 Welcome to SupremeWeb
+## 🚀 Welcome to ClearWeb
 
-SupremeWeb (formerly SupremeCopy) is no longer just a tool to unblock right-click. It is a comprehensive, all-in-one productivity suite designed to give you absolute control over the internet. Whether you are doing research, avoiding ads, or extracting text from images, SupremeWeb puts the power back in your hands.
+ClearWeb (formerly SupremeCopy) is no longer just a tool to unblock right-click. It is a comprehensive, all-in-one productivity suite designed to give you absolute control over the internet. Whether you are doing research, avoiding ads, or extracting text from images, ClearWeb puts the power back in your hands.
 
 ### 🌟 Core Features
 
