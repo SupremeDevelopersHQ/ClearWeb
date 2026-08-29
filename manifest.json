@@ -1,7 +1,7 @@
-{
+﻿{
     "manifest_version":  3,
     "name":  "ClearWeb: The Ultimate Web Toolkit",
-    "version":  "6.1.0",
+    "version":  "7.0.0",
     "description":  "The ultimate web enhancement suite: unblock right-click, OCR image extraction, Dark Mode, Clipboard Vault, and true Reader Mode!",
     "permissions":  [
                         "storage",
@@ -10,7 +10,8 @@
                         "downloads",
                         "tabs",
                         "contextMenus",
-                        "clipboardWrite"
+                        "clipboardWrite",
+                        "debugger"
                     ],
     "host_permissions":  [
                              "\u003call_urls\u003e"

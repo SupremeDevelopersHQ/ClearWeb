@@ -1,4 +1,4 @@
-const siteToggle = document.getElementById('site-toggle');
+﻿const siteToggle = document.getElementById('site-toggle');
 const globalToggle = document.getElementById('global-toggle');
 const statusText = document.getElementById('status-text');
 const reloadBtn = document.getElementById('reload-btn');
@@ -200,3 +200,6 @@ document.getElementById('clear-vault-btn').addEventListener('click', () => {
     loadVault();
   });
 });
+
+document.getElementById('screenshot-btn').addEventListener('click', () => chrome.runtime.sendMessage({type: 'FULL_SCREENSHOT'}));
+

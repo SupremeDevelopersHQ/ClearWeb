@@ -1,4 +1,4 @@
-const getDomain = (url) => {
+﻿const getDomain = (url) => {
   try { return new URL(url).hostname; } catch (e) { return null; }
 };
 
@@ -64,6 +64,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ success: true });
   }
 
+    if (message.type === 'FULL_SCREENSHOT') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      if (!tab || tab.url.startsWith('chrome://')) return;
+      
+      const debuggee = { tabId: tab.id };
+      chrome.debugger.attach(debuggee, "1.3", () => {
+        chrome.debugger.sendCommand(debuggee, "Page.getLayoutMetrics", {}, (metrics) => {
+          const w = metrics.cssContentSize ? metrics.cssContentSize.width : metrics.contentSize.width;
+          const h = metrics.cssContentSize ? metrics.cssContentSize.height : metrics.contentSize.height;
+          chrome.debugger.sendCommand(debuggee, "Page.captureScreenshot", {
+            clip: { x: 0, y: 0, width: w, height: h, scale: 1 },
+            captureBeyondViewport: true,
+            format: 'png'
+          }, (result) => {
+            chrome.debugger.detach(debuggee);
+            if (result && result.data) {
+              chrome.downloads.download({
+                url: 'data:image/png;base64,' + result.data,
+                filename: 'ClearWeb_FullPage.png',
+                saveAs: true
+              });
+            }
+          });
+        });
+      });
+    });
+    return true;
+  }
   if (message.type === 'CAPTURE_SCREEN') {
     chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
       sendResponse({ dataUrl });
@@ -78,7 +107,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "highlight-text",
-    title: "🖍️ Highlight Text & Save",
+    title: "ðŸ–ï¸ Highlight Text & Save",
     contexts: ["selection"]
   });
 });
@@ -88,3 +117,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, { type: "HIGHLIGHT_SELECTION" }).catch(()=>{});
   }
 });
+
