@@ -1,7 +1,7 @@
 ﻿{
     "manifest_version":  3,
-    "name":  "ClearWeb: The Ultimate Web Toolkit",
-    "version": "7.1.1",
+    "name":  "Zenbrowse: The Ultimate Web Toolkit",
+    "version": "7.2.0",
     "description": "The ultimate web suite: unblock right-click, OCR image extraction, Clipboard Vault, Dark Mode, and Full-Page Screenshots!",
     "permissions":  [
                         "storage",
@@ -61,6 +61,8 @@
                                      }
                                  ]
 }
+
+
 
 
 

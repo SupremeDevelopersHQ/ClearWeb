@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (result && result.data) {
               chrome.downloads.download({
                 url: 'data:image/png;base64,' + result.data,
-                filename: 'ClearWeb_FullPage.png',
+                filename: 'Zenbrowse_FullPage.png',
                 saveAs: true
               });
             }
@@ -117,5 +117,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, { type: "HIGHLIGHT_SELECTION" }).catch(()=>{});
   }
 });
+
 
 
