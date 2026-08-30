@@ -1,0 +1,5 @@
+﻿SupremeModels/
+*.zip
+
+ffmpeg_dir/
+patch_scroll.js

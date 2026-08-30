@@ -80,8 +80,8 @@ async function copyToClipboard(text) {
 const sendToTab = (type, payload = {}) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
-    chrome.tabs.sendMessage(tabs[0].id, { type, ...payload }, { frameId: 0 }).catch(()=>{});
-    window.close();
+    chrome.tabs.sendMessage(tabs[0].id, { type, ...payload }, { frameId: 0 });
+    setTimeout(() => window.close(), 150);
   });
 };
 
@@ -99,8 +99,8 @@ document.getElementById('reader-btn').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs[0] || tabs[0].url.startsWith('chrome://')) return;
     chrome.scripting.executeScript({ target: { tabId: tabs[0].id }, files: ['Readability.js'] }, () => {
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'READER_MODE' }).catch(()=>{});
-      window.close();
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'READER_MODE' });
+      setTimeout(() => window.close(), 150);
     });
   });
 });
@@ -211,4 +211,8 @@ document.getElementById('screenshot-btn').addEventListener('click', () => chrome
 
 
 document.getElementById('autoscroll-btn').addEventListener('click', () => sendToTab('START_AUTOSCROLL'));
+
+
+
+
 

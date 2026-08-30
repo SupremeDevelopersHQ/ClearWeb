@@ -1,4 +1,4 @@
-﻿const getBrowser = () => (typeof chrome !== 'undefined' ? chrome : browser);
+const getBrowser = () => (typeof chrome !== 'undefined' ? chrome : browser);
 const api = getBrowser();
 const currentDomain = window.location.hostname;
 let isUnblocked = false;
@@ -127,7 +127,12 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
       style.id = 'supreme-dark-mode';
       style.textContent = `
         html { background-color: #fff !important; filter: invert(1) hue-rotate(180deg) !important; }
-        img, video, iframe, canvas, svg, picture { filter: invert(1) hue-rotate(180deg) !important; }
+        img:not([class*="logo" i]):not([src*="logo" i]):not([id*="logo" i]), 
+        video, iframe, canvas, 
+        svg:not([class*="logo" i]):not([id*="logo" i]), 
+        picture { 
+          filter: invert(1) hue-rotate(180deg) !important; 
+        }
       `;
       document.head.appendChild(style);
       showToast('Dark Mode Enabled');
@@ -447,21 +452,59 @@ api.storage.local.get(['nukeCookies'], (data) => {
 
 // --- AUTO SCROLL ---
 let scrollInterval = null;
+let currentScrollSpeed = 1.5;
+
 function startAutoScroll() {
   if (scrollInterval) {
     clearInterval(scrollInterval);
     scrollInterval = null;
     return;
   }
-  let speed = 1.5;
-  scrollInterval = setInterval(() => {
-    window.scrollBy(0, speed);
-  }, 20);
+  
+  let scrollAccumulator = 0;
+  const startLoop = () => {
+    if (scrollInterval) clearInterval(scrollInterval);
+    scrollInterval = setInterval(() => {
+      scrollAccumulator += currentScrollSpeed;
+      if (scrollAccumulator >= 1) {
+        let pixels = Math.floor(scrollAccumulator);
+        window.scrollBy(0, pixels);
+        scrollAccumulator -= pixels;
+      }
+    }, 20);
+  };
+  
+  startLoop();
   
   const panel = document.createElement('div');
-  panel.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 15px;border-radius:20px;z-index:9999999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;cursor:pointer;';
-  panel.innerHTML = <span>&#128196; Auto-Scroll Active</span> <button id="cw-stop-scroll" style="background:#ef4444;border:none;color:white;padding:4px 8px;border-radius:8px;cursor:pointer;font-weight:bold;">Stop</button>;
+  panel.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 15px;border-radius:20px;z-index:9999999;font-family:sans-serif;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;user-select:none;';
+  
+  panel.innerHTML = `
+    <span style="font-weight:bold;margin-right:5px;">&#128196; Auto-Scroll</span>
+    <button id="cw-slower" style="background:#334155;border:none;color:white;padding:4px 10px;border-radius:6px;cursor:pointer;font-weight:bold;">-</button>
+    <span id="cw-speed-disp" style="width:35px;text-align:center;display:inline-block;">${currentScrollSpeed.toFixed(1)}x</span>
+    <button id="cw-faster" style="background:#334155;border:none;color:white;padding:4px 10px;border-radius:6px;cursor:pointer;font-weight:bold;">+</button>
+    <div style="width:1px;height:20px;background:#475569;margin:0 5px;"></div>
+    <button id="cw-stop-scroll" style="background:#ef4444;border:none;color:white;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:bold;">Stop</button>
+  `;
   document.body.appendChild(panel);
+  
+  const updateSpeedDisp = () => {
+    panel.querySelector('#cw-speed-disp').innerText = currentScrollSpeed.toFixed(1) + 'x';
+    startLoop();
+  };
+  
+  panel.querySelector('#cw-slower').onclick = (e) => {
+    e.stopPropagation();
+    currentScrollSpeed = Math.round(Math.max(0.1, currentScrollSpeed - 0.1) * 10) / 10;
+    updateSpeedDisp();
+  };
+  
+  panel.querySelector('#cw-faster').onclick = (e) => {
+    e.stopPropagation();
+    currentScrollSpeed = Math.round(Math.min(10.0, currentScrollSpeed + 0.1) * 10) / 10;
+    updateSpeedDisp();
+  };
   
   panel.querySelector('#cw-stop-scroll').onclick = (e) => {
     e.stopPropagation();
@@ -470,7 +513,8 @@ function startAutoScroll() {
     panel.remove();
   };
   
-  const stopEvents = () => {
+  const stopEvents = (e) => {
+    if (panel.contains(e.target)) return;
     if(scrollInterval) {
       clearInterval(scrollInterval);
       scrollInterval = null;
@@ -490,4 +534,5 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'NUKE_COOKIES' && request.enabled) nukeCookieBanners();
   if (request.type === 'START_AUTOSCROLL') startAutoScroll();
 });
+
 
