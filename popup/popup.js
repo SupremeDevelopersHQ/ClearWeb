@@ -10,7 +10,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = new URL(currentTab.url);
   const domain = url.hostname;
 
-  chrome.storage.sync.get(['enabledDomains', 'globalEnabled', 'blocksDefeated'], (data) => {
+  chrome.storage.local.get(['enabledDomains', 'globalEnabled', 'blocksDefeated'], (data) => {
     const enabledDomains = data.enabledDomains || {};
     siteToggle.checked = !!enabledDomains[domain];
     globalToggle.checked = !!data.globalEnabled;
@@ -19,18 +19,18 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
     siteToggle.addEventListener('change', () => {
       enabledDomains[domain] = siteToggle.checked;
-      chrome.storage.sync.set({ enabledDomains });
+      chrome.storage.local.set({ enabledDomains });
       updateStatusText();
       notifyTab(currentTab.id, siteToggle.checked || globalToggle.checked);
       chrome.tabs.reload(currentTab.id);
     });
 
         cookieToggle.addEventListener('change', () => {
-      chrome.storage.sync.set({ nukeCookies: cookieToggle.checked });
+      chrome.storage.local.set({ nukeCookies: cookieToggle.checked });
       chrome.tabs.sendMessage(currentTab.id, { type: 'NUKE_COOKIES', enabled: cookieToggle.checked }).catch(()=>{});
     });
     globalToggle.addEventListener('change', () => {
-      chrome.storage.sync.set({ globalEnabled: globalToggle.checked });
+      chrome.storage.local.set({ globalEnabled: globalToggle.checked });
       updateStatusText();
       notifyTab(currentTab.id, siteToggle.checked || globalToggle.checked);
       chrome.tabs.reload(currentTab.id);
@@ -211,3 +211,4 @@ document.getElementById('screenshot-btn').addEventListener('click', () => chrome
 
 
 document.getElementById('autoscroll-btn').addEventListener('click', () => sendToTab('START_AUTOSCROLL'));
+

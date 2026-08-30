@@ -10,7 +10,7 @@ const updateIcon = async (tabId, url) => {
     }
     const domain = getDomain(url);
     if (!domain) return;
-    const data = await chrome.storage.sync.get(['enabledDomains', 'globalEnabled']);
+    const data = await chrome.storage.local.get(['enabledDomains', 'globalEnabled']);
     const isEnabled = data.globalEnabled || (data.enabledDomains && data.enabledDomains[domain]);
     const path = isEnabled ? { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" } : { "16": "icons/icon16_off.png", "48": "icons/icon48_off.png", "128": "icons/icon128_off.png" };
     chrome.action.setIcon({ tabId, path }).catch(() => {});
@@ -117,4 +117,5 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, { type: "HIGHLIGHT_SELECTION" }).catch(()=>{});
   }
 });
+
 

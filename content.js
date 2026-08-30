@@ -26,10 +26,10 @@ function recordBlock() {
   statsTimeout = setTimeout(() => {
     try {
       if (!api || !api.storage) { sessionBlocks = 0; statsTimeout = null; return; }
-      api.storage.sync.get(['blocksDefeated'], (data) => {
+      api.storage.local.get(['blocksDefeated'], (data) => {
         if (api.runtime.lastError) return;
         const current = data.blocksDefeated || 0;
-        api.storage.sync.set({ blocksDefeated: current + sessionBlocks });
+        api.storage.local.set({ blocksDefeated: current + sessionBlocks });
         sessionBlocks = 0;
         statsTimeout = null;
       });
@@ -39,7 +39,7 @@ function recordBlock() {
 
 async function checkAndApply() {
   try {
-    const { enabledDomains = {}, globalEnabled = false } = await api.storage.sync.get(['enabledDomains', 'globalEnabled']);
+    const { enabledDomains = {}, globalEnabled = false } = await api.storage.local.get(['enabledDomains', 'globalEnabled']);
     const shouldEnable = globalEnabled || !!enabledDomains[currentDomain];
     if (shouldEnable && !isUnblocked) enableUnblocking();
     else if (!shouldEnable && isUnblocked) disableUnblocking();
@@ -437,7 +437,7 @@ function nukeCookieBanners() {
   }
 }
 
-api.storage.sync.get(['nukeCookies'], (data) => {
+api.storage.local.get(['nukeCookies'], (data) => {
   if (data.nukeCookies) {
     nukeCookieBanners();
     setTimeout(nukeCookieBanners, 2000);
@@ -490,3 +490,4 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'NUKE_COOKIES' && request.enabled) nukeCookieBanners();
   if (request.type === 'START_AUTOSCROLL') startAutoScroll();
 });
+
