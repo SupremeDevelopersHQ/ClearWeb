@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zenbrowse Screenshots Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+  body { background: #0f1117; color: white; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 60px; }
+  
+  .controls { position: sticky; top: 20px; z-index: 1000; background: #1e293b; padding: 20px 40px; border-radius: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+  button { background: #60a5fa; color: #0f1117; border: none; padding: 12px 24px; font-size: 16px; font-weight: 800; border-radius: 100px; cursor: pointer; transition: 0.2s; font-family: inherit; }
+  button:hover { background: #93c5fd; transform: translateY(-2px); }
+
+  .promo-frame { width: 1280px; height: 800px; background: radial-gradient(circle at 80% 20%, #1e293b, #0f1117); border-radius: 20px; overflow: hidden; position: relative; display: flex; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  
+  /* Background Elements */
+  .glow { position: absolute; width: 600px; height: 600px; background: rgba(96, 165, 250, 0.15); filter: blur(100px); border-radius: 50%; z-index: 0; }
+  .glow1 { top: -200px; right: -200px; }
+  .glow2 { bottom: -200px; left: -200px; background: rgba(167, 139, 250, 0.15); }
+  
+  /* Typography */
+  .text-content { flex: 1; padding: 120px 80px; z-index: 2; display: flex; flex-direction: column; justify-content: center; }
+  .tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 100px; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px; width: fit-content; border: 1px solid rgba(255,255,255,0.2); }
+  .title { font-size: 72px; font-weight: 800; line-height: 1.1; margin: 0 0 24px 0; letter-spacing: -1px; }
+  .title span { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { font-size: 28px; color: #94a3b8; line-height: 1.5; font-weight: 400; max-width: 500px; }
+  
+  /* Mock UI */
+  .visual-content { flex: 1.2; position: relative; z-index: 2; }
+  
+  .browser-window { position: absolute; width: 800px; height: 600px; background: #0f1117; border: 1px solid #334155; border-radius: 16px; box-shadow: -20px 20px 80px rgba(0,0,0,0.8); top: 100px; left: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .browser-header { height: 40px; background: #1a1f2e; border-bottom: 1px solid #334155; display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+  .browser-dots { display: flex; gap: 8px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ef4444; } .dot.y { background: #f59e0b; } .dot.g { background: #10b981; }
+  .browser-url { flex: 1; margin: 0 20px; height: 24px; background: #0f1117; border-radius: 6px; border: 1px solid #334155; }
+  
+  .browser-body { flex: 1; padding: 40px; background: #fff; color: #333; position: relative; }
+  .mock-text { width: 100%; height: 20px; background: #e2e8f0; margin-bottom: 16px; border-radius: 4px; }
+  .mock-text.short { width: 60%; }
+  .mock-text.title { height: 40px; background: #cbd5e1; margin-bottom: 30px; width: 80%; }
+  
+  .popup-overlay { position: absolute; top: 50px; right: 50px; width: 340px; height: 400px; background: #0f1117; border: 1px solid #334155; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); }
+  
+  .feature-pill { position: absolute; background: #1e293b; border: 1px solid #334155; padding: 16px 24px; border-radius: 100px; font-weight: 600; font-size: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; }
+  .feature-pill i { font-style: normal; font-size: 24px; }
+  
+  /* Variations */
+  #frame2 { background: radial-gradient(circle at 20% 80%, #1e293b, #0f1117); }
+  #frame2 .text-content { align-items: flex-end; text-align: right; }
+  #frame2 .browser-window { left: auto; right: 0; }
+  #frame2 .popup-overlay { right: auto; left: 50px; }
+  
+  #frame3 { background: radial-gradient(circle at 50% 50%, #1e293b, #0f1117); flex-direction: column; }
+  #frame3 .text-content { flex: 0.8; align-items: center; text-align: center; padding: 60px 80px 0 80px; }
+  #frame3 .visual-content { display: flex; justify-content: center; }
+  #frame3 .browser-window { position: relative; top: 0; left: 0; width: 1000px; height: 500px; }
+
+:root {
+  --bg-color: #ffffff;
+  --card-bg: #f8f9fa;
+  --text-main: #202124;
+  --text-secondary: #5f6368;
+  --accent-color: #1a73e8;
+  --border-color: #dadce0;
+}
+body {
+  width: 380px;
+  margin: 0;
+  font-family: 'Google Sans', Roboto, 'Segoe UI', Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+}
+.container { padding: 16px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.brand-title { margin: 0; font-size: 18px; font-weight: 500; color: var(--text-main); }
+.status-indicator { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 100px; background: var(--card-bg); color: var(--text-secondary); border: 1px solid var(--border-color); }
+.card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); }
+.tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; }
+.tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: 0.2s; }
+.tab.active { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); }
+.tab:hover:not(.active) { background: #f1f3f4; }
+.toggle-group { display: flex; justify-content: space-between; align-items: center; }
+.toggle-label { font-size: 14px; font-weight: 500; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #dadce0; transition: .3s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+input:checked + .slider { background-color: var(--accent-color); }
+input:checked + .slider:before { transform: translateX(20px); }
+.btn-reload { width: 100%; padding: 10px; background: #e8f0fe; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 100px; cursor: pointer; font-weight: 500; margin-bottom: 16px; transition: .2s; }
+.btn-reload:hover { background: var(--accent-color); color: white; }
+.stats-container { text-align: center; padding: 10px; margin-bottom: 16px; background: #e8f0fe; border-radius: 8px; border: 1px solid #d2e3fc; }
+.stats-container p { margin: 0; font-size: 13px; color: var(--accent-color); font-weight: 500;}
+
+.btn-snipe { width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px; transition: .2s; }
+.btn-snipe:hover { background: #ef4444; color: white; }
+
+.btn-zen { width: 100%; padding: 10px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px; transition: .2s; }
+.btn-zen:hover { background: #3b82f6; color: white; }
+
+.btn-markdown { width: 100%; padding: 10px; background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid #a855f7; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 12px; transition: .2s; }
+.btn-markdown:hover { background: #a855f7; color: white; }
+
+.qr-hover:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+  <div class="controls">
+    <button onclick="downloadScreenshots()">Download All Screenshots</button>
+  </div>
+
+  <!-- Screenshot 1: Total Freedom -->
+  <div class="promo-frame" id="frame1">
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
+    
+    <div class="text-content">
+      <div class="tag">Unrestricted Browsing</div>
+      <h1 class="title">Total <span>Freedom</span><br>to Browse.</h1>
+      <p class="subtitle">Bypass copy protections, nuke annoying cookie banners, and take control.</p>
+    </div>
+    
+    <div class="visual-content">
+      <div class="browser-window">
+        <div class="browser-header">
+          <div class="browser-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <div class="browser-url"></div>
+        </div>
+        <div class="browser-body">
+          <div class="mock-text title"></div>
+          <div class="mock-text"></div><div class="mock-text"></div><div class="mock-text short"></div>
+          <br>
+          <div style="background: rgba(239, 68, 68, 0.1); padding: 20px; border: 1px dashed #ef4444; border-radius: 8px; color: #ef4444; font-weight: bold; text-align: center; margin: 40px 0;">Content Copying Disabled</div>
+        </div>
+      </div>
+      
+      <div class="feature-pill" style="top: 300px; left: -50px;"><i>???</i> Copy Protections Disabled</div>
+      
+      <!-- Mock Popup -->
+      <div class='popup-overlay' style='padding: 16px; background: #0f1117; color: #e2e8f0; font-family: sans-serif;'>
+  <div class="container">
+    <div class="header">
+      <h1 class="brand-title">Zenbrowse</h1>
+      <div class="status-badge" id="status-text">OFF</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tab-tools">Tools</div>
+      <div class="tab" id="tab-vault">Vault</div>
+    </div>
+    <div id="view-tools">
+      <div class="card">
+        <div class="toggle-group">
+          <span class="toggle-label">Enable on this site</span>
+          <label class="switch"><input type="checkbox" id="site-toggle"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-group">
+          <span class="toggle-label">Global Mode (All Sites)</span>
+          <label class="switch"><input type="checkbox" id="global-toggle"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-group" id="cookie-row" style="display:none">
+          <span class="toggle-label">Auto-Nuke Cookies</span>
+          <label class="switch"><input type="checkbox" id="cookie-toggle"><span class="slider"></span></label>
+        </div>
+      </div>
+      <div class="stats-container">
+        &#128737; Blocks Defeated: <span id="stats-counter">0</span>
+      </div>
+      <div class="grid">
+        <button id="md-btn" class="btn-action">&#128221; Copy MD</button>
+        <button id="reader-btn" class="btn-action">&#128214; Reader Mode</button>
+      </div>
+      <div class="grid">
+        <button id="darkmode-btn" class="btn-action">&#127769; Dark Mode</button>
+        <button id="download-btn" class="btn-action">&#128190; Save as .txt</button>
+      </div>
+      <div class="grid">
+        <button id="images-btn" class="btn-action">&#128444; Extract Images</button>
+        <button id="snipe-btn" class="btn-action">&#127919; Snipe HTML</button>
+      </div>
+      <div class="grid">
+        <button id="clean-url-btn" class="btn-action">&#128279; Clean URL</button>
+        <button id="ocr-btn" class="btn-action">&#128269; OCR Image Text</button>
+      </div>
+      <div class="grid">
+        <button id="screenshot-btn" class="btn-action">&#128248; Full Page Snap</button>
+        <button id="autoscroll-btn" class="btn-action">&#128196; Auto-Scroll</button>
+      </div>
+      <button id="reload-btn" class="btn-reload">&#128260; Reload page to apply</button>
+      <div class="footer">
+        <p>&#9749; Support the Developer</p>
+        <a href="https://buymeacoffee.com/vgexperiments" target="_blank" class="btn-coffee">&#9749; Buy Me A Coffee</a>
+      </div>
+    </div>
+    <div id="view-vault" style="display:none">
+      <div id="vault-list"></div>
+      <button id="clear-vault-btn" class="btn-clear">&#128465; Clear History</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</div>
+    </div>
+  </div>
+
+  <!-- Screenshot 2: Extract Anything -->
+  <div class="promo-frame" id="frame2">
+    <div class="glow glow1" style="background: rgba(167, 139, 250, 0.15);"></div>
+    
+    <div class="visual-content">
+      <div class="browser-window">
+        <div class="browser-header">
+          <div class="browser-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <div class="browser-url"></div>
+        </div>
+        <div class="browser-body" style="background: #1e293b; color: white;">
+          <div style="width: 100%; height: 200px; background: #334155; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #94a3b8;">Image with Text Inside</div>
+          <div style="position: absolute; top: 140px; left: 140px; width: 400px; height: 120px; border: 3px dashed #60a5fa; background: rgba(96, 165, 250, 0.2);"></div>
+        </div>
+      </div>
+      
+      <div class="feature-pill" style="top: 200px; right: -50px;"><i>???</i> On-Screen OCR</div>
+      <div class="feature-pill" style="top: 400px; right: 80px;"><i>??</i> Element Sniper</div>
+    </div>
+    
+    <div class="text-content">
+      <div class="tag">Extract Anything</div>
+      <h1 class="title">Extract <span>Text</span> & <br><span>Images</span> instantly.</h1>
+      <p class="subtitle">Use Sniper Mode to grab hidden images, or cloud OCR to pull text out of any video or image.</p>
+    </div>
+  </div>
+  
+  <!-- Screenshot 3: Focus Mode -->
+  <div class="promo-frame" id="frame3">
+    <div class="text-content">
+      <div class="tag">Zen Mode</div>
+      <h1 class="title">Read in <span>Peace</span>.</h1>
+      <p class="subtitle">Instantly strip away ads and clutter with Reader Mode, and let Auto-Scroll read for you.</p>
+    </div>
+    
+    <div class="visual-content">
+      <div class="browser-window">
+        <div class="browser-header">
+          <div class="browser-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <div class="browser-url"></div>
+        </div>
+        <div class="browser-body" style="background: #f8f9fa; display: flex; justify-content: center; padding: 60px;">
+          <div style="width: 600px;">
+            <div style="font-family: Georgia, serif; font-size: 32px; font-weight: bold; margin-bottom: 20px; color: #111;">The Art of Reading</div>
+            <div style="font-family: Georgia, serif; font-size: 18px; color: #333; line-height: 1.8;">Once upon a time, the web was filled with text. Now it is filled with ads, popups, and banners. Reader mode restores the balance, giving you back your peace of mind and focus...</div>
+          </div>
+          
+          <div style="position: absolute; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 100px; display: flex; gap: 10px; align-items: center; font-weight: 600; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+            ?? Auto-Scroll <span style="background: #334155; padding: 4px 10px; border-radius: 8px;">1.5x</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function downloadScreenshots() {
+      const frames = ['frame1', 'frame2', 'frame3'];
+      for (let i = 0; i < frames.length; i++) {
+        const el = document.getElementById(frames[i]);
+        // Add a slight delay to ensure iframe paints if possible, though html2canvas might not capture cross-origin iframes perfectly.
+        // Wait, local iframe (popup.html) might render fine if served over http, but from file:// it triggers CORS in html2canvas.
+        // We will just try!
+        const canvas = await html2canvas(el, { scale: 1, allowTaint: true, useCORS: true });
+        const url = canvas.toDataURL("image/jpeg", 0.95);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Store_Screenshot_${i+1}.jpg`;
+        a.click();
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
