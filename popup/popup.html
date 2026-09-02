@@ -2,41 +2,306 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="popup.css">
   <title>Zenbrowse</title>
   <style>
-    .btn-action {
-      background-color: #ffffff;
-      color: #1a73e8;
-      border: 1px solid #dadce0;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 340px;
+      min-height: 400px;
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: 'Google Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    .container { padding: 16px; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
       border-radius: 100px;
-      padding: 10px 14px;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      letter-spacing: 0.3px;
+    }
+
+    .status-badge.on {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.3);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: #1a1f2e;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 14px;
+      gap: 4px;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 7px 0;
+      border-radius: 9px;
+      cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      font-family: 'Google Sans', Roboto, 'Segoe UI', Arial, sans-serif;
+      color: #64748b;
+      transition: all 0.2s ease;
+    }
+
+    .tab.active {
+      background: #1e293b;
+      color: #e2e8f0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Card */
+    .card {
+      background: #1a1f2e;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    /* Toggle group */
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .toggle-group + .toggle-group {
+      border-top: 1px solid #1e293b;
+      margin-top: 6px;
+      padding-top: 12px;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 400;
+    }
+
+    /* Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #334155;
+      border-radius: 100px;
+      transition: 0.3s;
+    }
+    .slider:before {
+      position: absolute; content: "";
+      height: 16px; width: 16px;
+      left: 3px; bottom: 3px;
+      background: #94a3b8;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    input:checked + .slider { background: #3b82f6; }
+    input:checked + .slider:before { background: white; transform: translateX(18px); }
+
+    /* Stats */
+    .stats-container {
+      background: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(167,139,250,0.08));
+      border: 1px solid rgba(96,165,250,0.15);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .stats-container span {
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Grid of buttons */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+
+    .btn-action {
+      background: #1a1f2e;
+      color: #cbd5e1;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 10px 8px;
+      font-size: 12px;
+      font-weight: 400;
+      font-family: inherit;
       width: 100%;
       cursor: pointer;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-      margin-bottom: 8px;
-      box-shadow: none;
+      transition: all 0.18s ease;
+      text-align: center;
+      line-height: 1.3;
     }
-    .btn-action:hover { background-color: #f8f9fa; border-color: #d2e3fc; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+
+    .btn-action:hover {
+      background: #1e293b;
+      border-color: #334155;
+      color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .btn-action:active {
+      transform: translateY(0);
+      background: rgba(96,165,250,0.1);
+      border-color: rgba(96,165,250,0.3);
+      color: #60a5fa;
+    }
+
+    .btn-reload {
+      width: 100%;
+      background: rgba(59,130,246,0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 7px;
+      display: none;
+      transition: all 0.18s;
+    }
+
+    .btn-reload:hover { background: rgba(59,130,246,0.18); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .btn-coffee {
+      display: inline-block;
+      background: #FFDD00;
+      color: #1a1a1a;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 18px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-coffee:hover { opacity: 0.85; }
+
+    /* Vault */
+    #vault-list {
+      max-height: 350px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .vault-item {
+      background: #1a1f2e;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .vault-item:hover { border-color: #334155; background: #1e293b; }
+    .vault-item:active { border-color: rgba(96,165,250,0.4); background: rgba(96,165,250,0.05); }
+
+    .vault-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #475569;
+      margin-bottom: 5px;
+    }
+
+    .vault-text { font-size: 12px; color: #94a3b8; line-height: 1.4; word-break: break-word; }
+
+    .btn-clear {
+      width: 100%;
+      background: rgba(239,68,68,0.08);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .btn-clear:hover { background: rgba(239,68,68,0.15); }
+
+    .vault-empty {
+      text-align: center;
+      color: #475569;
+      padding: 30px 0;
+      font-size: 13px;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+
     <div class="header">
       <h1 class="brand-title">Zenbrowse</h1>
-      <div class="status-indicator" id="status-text">OFF</div>
+      <div class="status-badge" id="status-text">OFF</div>
     </div>
 
     <div class="tabs">
-      <div class="tab active" id="tab-tools" style="padding: 10px 5px; font-size: 13px;">Tools</div>
-      <div class="tab" id="tab-vault" style="padding: 10px 5px; font-size: 13px;">Vault</div>
+      <div class="tab active" id="tab-tools">Tools</div>
+      <div class="tab" id="tab-vault">Vault</div>
     </div>
 
     <div id="view-tools">
+
       <div class="card">
         <div class="toggle-group">
           <span class="toggle-label">Enable on this site</span>
@@ -45,63 +310,62 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="toggle-group" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.05);">
+        <div class="toggle-group">
           <span class="toggle-label">Global Mode (All Sites)</span>
           <label class="switch">
             <input type="checkbox" id="global-toggle">
             <span class="slider"></span>
           </label>
         </div>
+        <div class="toggle-group" id="cookie-row" style="display:none">
+          <span class="toggle-label">Auto-Nuke Cookies</span>
+          <label class="switch">
+            <input type="checkbox" id="cookie-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
 
-      <div class="stats-container" style="margin-bottom: 12px; padding: 10px;">
-        <p>&#128737; Blocks Defeated: <span id="stats-counter" style="color: #1a73e8; font-weight: bold;">0</span></p>
-      </div>
-
-            <div class="grid">
-        <button id="md-btn" class="btn-action">&#128221; Copy MD</button>
-        <button id="reader-btn" class="btn-action">&#128214; Reader Mode</button>
-      </div>
-      
-      <div class="grid">
-        <button id="darkmode-btn" class="btn-action">&#127769; Dark Mode</button>
-        <button id="download-btn" class="btn-action">&#128190; Save as .txt</button>
+      <div class="stats-container">
+        🛡️ Blocks Defeated: <span id="stats-counter">0</span>
       </div>
 
       <div class="grid">
-        <button id="images-btn" class="btn-action">&#128444; Extract Images</button>
-        <button id="snipe-btn" class="btn-action">&#127919; Snipe HTML</button>
+        <button id="md-btn" class="btn-action">📝 Copy MD</button>
+        <button id="reader-btn" class="btn-action">📖 Reader Mode</button>
       </div>
-
       <div class="grid">
-        <button id="clean-url-btn" class="btn-action">&#128279; Clean URL</button>
-        <button id="ocr-btn" class="btn-action">&#128269; OCR Image Text</button>
+        <button id="darkmode-btn" class="btn-action">🌙 Dark Mode</button>
+        <button id="download-btn" class="btn-action">💾 Save as .txt</button>
+      </div>
+      <div class="grid">
+        <button id="images-btn" class="btn-action">🖼 Extract Images</button>
+        <button id="snipe-btn" class="btn-action">🎯 Snipe HTML</button>
+      </div>
+      <div class="grid">
+        <button id="clean-url-btn" class="btn-action">🔗 Clean URL</button>
+        <button id="ocr-btn" class="btn-action">🔍 OCR Image Text</button>
+      </div>
+      <div class="grid">
+        <button id="screenshot-btn" class="btn-action">📷 Full Page Snap</button>
+        <button id="autoscroll-btn" class="btn-action">📜 Auto-Scroll</button>
       </div>
 
-            <div class="grid">
-        <button id="screenshot-btn" class="btn-action">&#128248; Full Page Snap</button>
-        <button id="autoscroll-btn" class="btn-action">&#128196; Auto-Scroll</button>
+      <button id="reload-btn" class="btn-reload">🔄 Reload page to apply</button>
+
+      <div class="footer">
+        <p>☕ Support the Developer</p>
+        <a href="https://buymeacoffee.com/" target="_blank" class="btn-coffee">☕ Buy Me A Coffee</a>
       </div>
-      <button id="reload-btn" class="btn-action" style="display: none;">&#128260; Reload page to apply</button>
+
     </div>
 
-    <div id="view-vault" style="display: none;">
-      <div id="vault-list" style="max-height: 380px; overflow-y: auto; margin-bottom: 10px; padding-right: 4px;">
-        <!-- Populated by JS -->
-      </div>
-      <button id="clear-vault-btn" class="btn-action" style="color: #d93025; border-color: #fce8e6; background: #fce8e6; margin-bottom: 0;">&#128465; Clear History</button>
+    <div id="view-vault" style="display:none">
+      <div id="vault-list"></div>
+      <button id="clear-vault-btn" class="btn-clear">🗑 Clear History</button>
     </div>
 
-    <div style="text-align: center; margin-top: 15px; border-top: 1px solid #dadce0; padding-top: 15px;">
-      <p style="font-size: 13px; color: #5f6368; font-weight: 500; margin: 0 0 10px 0;">&#9749; Support the Developer</p>
-      <a href="https://buymeacoffee.com/" target="_blank" style="display:inline-block;background:#FFDD00;color:#000;font-family:sans-serif;font-size:13px;padding:8px 20px;border-radius:20px;text-decoration:none;">☕ Buy Me A Coffee</a>
-    </div>
   </div>
   <script src="popup.js"></script>
 </body>
 </html>
-
-
-
-
-
